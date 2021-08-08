@@ -73,7 +73,7 @@ class LineBotController extends Controller
           'query' => [
             'lat' => $lat,
             'lon' => $lon,
-            'appid' => '1ad5efe09723bad6e6c9238084d91d7c',
+            'appid' => env('WEATHER_API_KEY'),
             'lang' => 'ja',
             'exclude' => 'current,minutely,daily,alerts',
           ],
