@@ -66,7 +66,7 @@ class LineBotController extends Controller
       $replyToken = $event->getReplyToken();
       $address = $event->getAddress();
       $lat = $event->getLatitude();
-      $lon = $event->getLatitude();
+      $lon = $event->getLongitude();
 
       $response = $client
         ->get('https://api.openweathermap.org/data/2.5/onecall',[
@@ -93,7 +93,6 @@ class LineBotController extends Controller
         $code = substr($weather['id'], 0, 1);
 
         if($code === '2' or $code === '5'){
-          \Log::debug('success');
           $result = '×';
         }
         
