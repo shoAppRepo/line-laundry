@@ -76,6 +76,7 @@ class LineBotController extends Controller
             'appid' => env('WEATHER_API_KEY'),
             'lang' => 'ja',
             'exclude' => 'current,minutely,daily,alerts',
+            'units' => 'metric',
           ],
         ]);
 
@@ -90,7 +91,7 @@ class LineBotController extends Controller
         $weather = $items[$i]['weather'][0];
         $date_time = date('m/d H:i', $items[$i]['dt']);
         $description = $weather['description'];
-        $feel_like = $weather['feels_like'];
+        $feel_like = $items[$i]['feels_like'];
         $code = substr($weather['id'], 0, 1);
 
         if($code === '2' or $code === '5'){
@@ -101,7 +102,7 @@ class LineBotController extends Controller
           $result = '△';
         }
 
-        $information .= '▼'. $date_time. "\n" . '予報：'. $description . '体感温度：' .$feel_like ."\n";
+        $information .= '▼'. $date_time. "\n" . '予報：'. $description . "\n" .'体感温度：' .$feel_like. '℃' ."\n". "\n";
       }
 
       $replyContent = $address . "\n" . '洗濯もの'. ' '. $result. "\n" . $information;
