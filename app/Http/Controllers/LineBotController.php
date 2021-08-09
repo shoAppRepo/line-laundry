@@ -68,6 +68,8 @@ class LineBotController extends Controller
       $lat = $event->getLatitude();
       $lon = $event->getLongitude();
 
+      $lat = '43.068564';
+      $lon = '141.3507138';
       $response = $client
         ->get('https://api.openweathermap.org/data/2.5/onecall',[
           'query' => [
@@ -85,29 +87,77 @@ class LineBotController extends Controller
       $items = $decode['hourly'];
 
       // 12時間分の情報だけ確認
-      $result = '〇';
+      $laundry_result = '〇';
+      $umbrella_result = '×';
+      $rain_info = null;
       $information = '';
       for($i=0; $i<=12; $i++){
         $weather = $items[$i]['weather'][0];
         $date_time = date('m/d H:i', $items[$i]['dt']);
         $description = $weather['description'];
         $feel_like = $items[$i]['feels_like'];
-        $code = substr($weather['id'], 0, 1);
-
-        if($code === '2' or $code === '5'){
-          $result = '×';
-        }
         
-        if($result !== '×' and $code === '3'){
-          $result = '△';
+        // 洗濯物の判定
+        $code = substr($weather['id'], 0, 1);
+        $laundry_result = $this->judgeLaundry($code, $laundry_result);
+
+        // 傘の判定
+        if(array_key_exists('rain', $items[$i])){
+          $rain = $items[$i]['rain']['1h'];
+          list(
+            $umbrella_result,
+            $rain_description,
+          ) = $this->judgeUmbrella($rain, $umbrella_result);
+          $rain_info = $rain. 'mm/h'. $rain_description. "\n";
         }
 
-        $information .= '▼'. $date_time. "\n" . '予報：'. $description . "\n" .'体感温度：' .$feel_like. '℃' ."\n". "\n";
+        $information .= '▼'. $date_time. "\n" 
+          . '予報：'. $description. "\n" 
+          . '降水量：'. $rain_info
+          .'体感温度：' . $feel_like. '℃'. "\n". "\n";
       }
 
-      $replyContent = $address . "\n" . "\n" . '洗濯物：'. ' '. $result. "\n" . "\n" . $information;
+      $laundry = '洗濯物：'. $laundry_result;
+      $umbrella = '傘：'. $umbrella_result;
+
+      $replyContent = $address."\n". "\n". $laundry."\n". $umbrella. "\n". "\n". $information;
 
       $lineBot->replyText($replyToken, $replyContent);
     }
+  }
+
+  public function judgeLaundry(string $code, string $laundry_result)
+  {
+    if($code === '2' or $code === '5'){
+      $laundry_result = '×';
+    }
+    
+    if($laundry_result !== '×' and $code === '3'){
+      $laundry_result = '△';
+    }
+
+    return $laundry_result;
+  }
+
+  public function judgeUmbrella(int $rain, string $umbrella_result)
+  {
+    $rain_description = '';
+
+    if($rain > 0 && $rain < 5){
+      $umbrella_result = '△';
+      $rain_description = '(ポツポツ)';
+    }
+
+    if($rain >= 5 && $rain < 20 ){
+      $umbrella_result = '〇';
+      $rain_description = '(本降り)';
+    }
+
+    if($rain >= 20){
+      $umbrella_result = '◎';
+      $rain_description = '(土砂降り)';
+    }
+
+    return [$umbrella_result, $rain_description];
   }
 }
