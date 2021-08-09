@@ -105,7 +105,7 @@ class LineBotController extends Controller
         $information .= '▼'. $date_time. "\n" . '予報：'. $description . "\n" .'体感温度：' .$feel_like. '℃' ."\n". "\n";
       }
 
-      $replyContent = $address . "\n" . '洗濯もの'. ' '. $result. "\n" . $information;
+      $replyContent = $address . "\n" . "\n" . '洗濯物：'. ' '. $result. "\n" . "\n" . $information;
 
       $lineBot->replyText($replyToken, $replyContent);
     }
