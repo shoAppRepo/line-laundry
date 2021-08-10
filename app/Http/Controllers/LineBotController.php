@@ -67,9 +67,7 @@ class LineBotController extends Controller
       $address = $event->getAddress();
       $lat = $event->getLatitude();
       $lon = $event->getLongitude();
-
-      $lat = '43.068564';
-      $lon = '141.3507138';
+      
       $response = $client
         ->get('https://api.openweathermap.org/data/2.5/onecall',[
           'query' => [
