@@ -106,12 +106,14 @@ class LineBotController extends Controller
             $umbrella_result,
             $rain_description,
           ) = $this->judgeUmbrella($rain, $umbrella_result);
-          $rain_info = $rain. 'mm/h'. $rain_description. "\n";
+          $rain_info = $rain. 'mm/h'. $rain_description;
+        }else{
+          $rain_info = 'なし';
         }
 
         $information .= '▼'. $date_time. "\n" 
           . '予報：'. $description. "\n" 
-          . '降水量：'. $rain_info
+          . '降水量：'. $rain_info. "\n"
           .'体感温度：' . $feel_like. '℃'. "\n". "\n";
       }
 
